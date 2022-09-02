@@ -392,11 +392,17 @@ class SX127x:
         self.set_lock(True)              # lock until TX_Done
         irq_flags = self.get_irq_flags()
 
-        if (irq_flags == IRQ_RX_DONE_MASK):  # RX_DONE only, irq_flags should be 0x40
+        #if (irq_flags == IRQ_RX_DONE_MASK):  # RX_DONE only, irq_flags should be 0x40
             # automatically standby when RX_DONE
-            if self._on_receive:
-                payload = self.read_payload()
-                self._on_receive(self, payload)
+        if irq_flags & IRQ_RX_DONE_MASK == IRQ_RX_DONE_MASK:
+            if self._on_receive_cb:
+                    print('msg coming in')
+                    payload = self.read_payload()
+                    self._on_receive_cb(payload)    
+            
+            #if self._on_receive:
+             #   payload = self.read_payload()
+              #  self._on_receive(self, payload)
 
         elif self.read_register(REG_OP_MODE) != (
             MODE_LONG_RANGE_MODE | MODE_RX_SINGLE
